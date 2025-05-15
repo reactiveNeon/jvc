@@ -5,9 +5,12 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/reactiveNeon/jvc/internal/constants"
 )
 
 func HashObject(obj any) (string, []byte, error) {
@@ -22,7 +25,7 @@ func HashObject(obj any) (string, []byte, error) {
 }
 
 func WriteObject(hash string, data []byte) error {
-	dir := filepath.Join(".jvc/objects", hash[:2])
+	dir := filepath.Join(fmt.Sprintf(".%v/objects", constants.JvcDirName), hash[:2])
 	file := hash[2:]
 
 	if err := os.MkdirAll(dir, 0755); err != nil {
@@ -44,7 +47,7 @@ func WriteObject(hash string, data []byte) error {
 }
 
 func LoadObject(hash string) (map[string]any, error) {
-	dir := filepath.Join(".jvc/objects", hash[:2])
+	dir := filepath.Join(fmt.Sprintf(".%v/objects", constants.JvcDirName), hash[:2])
 	file := hash[2:]
 
 	f, err := os.Open(filepath.Join(dir, file))

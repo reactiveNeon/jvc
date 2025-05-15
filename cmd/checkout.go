@@ -47,6 +47,11 @@ var checkoutCmd = &cobra.Command{
 		}
 
 		cmd.Printf("Checked out commit %s to %s\n", hash, outputFile)
+
+		if err := utils.WriteHead(hash); err != nil {
+			cmd.PrintErrf("Error writing HEAD: %v\n", err)
+			return
+		}
 	},
 }
 

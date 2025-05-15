@@ -20,8 +20,8 @@ func StoreJson(value any) (string, error) {
 
 		blob := model.Blob{
 			Object: model.Object{
-				Type:  "blob",
-				Size:  len(val),  // get the byte size of the string
+				Type: "blob",
+				Size: len(val), // get the byte size of the string
 			},
 			Value: v,
 		}
@@ -45,7 +45,7 @@ func StoreJson(value any) (string, error) {
 			keys = append(keys, key)
 		}
 
-		sort.Strings(keys)  // sort keys for consistent ordering/hashing
+		sort.Strings(keys) // sort keys for consistent ordering/hashing
 
 		for _, key := range keys {
 			hash, err := StoreJson(v[key])
@@ -53,18 +53,18 @@ func StoreJson(value any) (string, error) {
 				return "", err
 			}
 			entries = append(entries, model.TreeEntry{
-				Key: key,
+				Key:  key,
 				Hash: hash,
 			})
 		}
 
 		tree := model.Tree{
 			Object: model.Object{
-				Type:    "tree",
-				Size:    len(entries),
+				Type: "tree",
+				Size: len(entries),
 			},
 			Structure: model.TreeEntryStructureObject,
-			Entries: entries,	
+			Entries:   entries,
 		}
 
 		hash, data, err := utils.HashObject(tree)
@@ -86,18 +86,18 @@ func StoreJson(value any) (string, error) {
 				return "", err
 			}
 			entries = append(entries, model.TreeEntry{
-				Key: strconv.Itoa(i),
+				Key:  strconv.Itoa(i),
 				Hash: hash,
 			})
 		}
 
 		tree := model.Tree{
 			Object: model.Object{
-				Type:    "tree",
-				Size:    len(entries),
+				Type: "tree",
+				Size: len(entries),
 			},
 			Structure: model.TreeEntryStructureArray,
-			Entries: entries,
+			Entries:   entries,
 		}
 
 		hash, data, err := utils.HashObject(tree)
@@ -121,8 +121,8 @@ func StoreCommit(treeHash, parentHash, message string) (string, error) {
 
 	commit := model.Commit{
 		Object: model.Object{
-			Type:      "commit",
-			Size:      len(message),
+			Type: "commit",
+			Size: len(message),
 		},
 		Tree:      treeHash,
 		Parent:    parentHash,
