@@ -20,14 +20,21 @@ func HashObject(obj any) (string, []byte, error) {
 }
 
 func WriteObject(hash string, data []byte) error {
-	dir := ".jvc/objects"
-	os.MkdirAll(dir, 0755)
+	dir := filepath.Join(".jvc/objects", hash[:2])
+	file := hash[2:]
 
-	return os.WriteFile(filepath.Join(dir, hash), data, 0644)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return err
+	}
+
+	return os.WriteFile(filepath.Join(dir, file), data, 0644)
 }
 
 func LoadObject(hash string) (map[string]any, error) {
-	data, err := os.ReadFile(filepath.Join(".jvc/objects", hash))
+	dir := filepath.Join(".jvc/objects", hash[:2])
+	file := hash[2:]
+
+	data, err := os.ReadFile(filepath.Join(dir, file))
 	if err != nil {
 		return nil, err
 	}
