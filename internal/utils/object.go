@@ -1,11 +1,13 @@
 package utils
 
 import (
+	"compress/zlib"
 	"crypto/sha256"
-	"os"
-	"path/filepath"
 	"encoding/hex"
 	"encoding/json"
+	"io"
+	"os"
+	"path/filepath"
 )
 
 func HashObject(obj any) (string, []byte, error) {
@@ -27,14 +29,37 @@ func WriteObject(hash string, data []byte) error {
 		return err
 	}
 
-	return os.WriteFile(filepath.Join(dir, file), data, 0644)
+	f, err := os.Create(filepath.Join(dir, file))
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	w := zlib.NewWriter(f)
+	defer w.Close()
+
+	_, err = w.Write(data)
+
+	return err
 }
 
 func LoadObject(hash string) (map[string]any, error) {
 	dir := filepath.Join(".jvc/objects", hash[:2])
 	file := hash[2:]
 
-	data, err := os.ReadFile(filepath.Join(dir, file))
+	f, err := os.Open(filepath.Join(dir, file))
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	r, err := zlib.NewReader(f)
+	if err != nil {
+		return nil, err
+	}
+	defer r.Close()
+
+	data, err := io.ReadAll(r)
 	if err != nil {
 		return nil, err
 	}
